@@ -38,11 +38,3 @@ document.querySelectorAll('.news-button').forEach(button => {
 });
 
 
-document.querySelector('.join-button').addEventListener('click', function() {
-    alert('¡Gracias por tu interés! Te contactaremos para más información sobre cómo unirte.');
-});
-
-
-document.querySelector('.read-more').addEventListener('click', function() {
-    alert('Más información sobre la cooperativa próximamente...');
-});
