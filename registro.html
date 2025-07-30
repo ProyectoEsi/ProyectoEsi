@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="imagenes/4.png">
+    <title>Iniciar Sesion - Cooperativa COVINICH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1C1C1C 0%, #2a2a2a 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(28, 28, 28, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #F5F5DC;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: #F5F5DC;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #A5D6A7;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icons a {
+            color: #F5F5DC;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #A5D6A7;
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(165,214,167,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(139,195,74,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(165,214,167,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .auth-card {
+            background: rgba(245, 245, 220, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+            animation: slideInUp 0.8s ease;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+        }
+
+        .auth-title {
+            font-size: 2rem;
+            color: #1C1C1C;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .auth-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .form-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: rgba(28, 28, 28, 0.1);
+            border-radius: 15px;
+            padding: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(45deg, #A5D6A7, #8BC34A);
+            color: #1C1C1C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(165, 214, 167, 0.3);
+        }
+
+        .form-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #1C1C1C;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: white;
+            color: #1C1C1C;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #A5D6A7;
+            box-shadow: 0 0 0 3px rgba(165, 214, 167, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-button {
+            background: linear-gradient(45deg, #A5D6A7, #8BC34A);
+            color: #1C1C1C;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(165, 214, 167, 0.3);
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .file-preview img {
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(45deg, #A5D6A7, #8BC34A);
+            color: #1C1C1C;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(165, 214, 167, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: #A5D6A7;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: #8BC34A;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #A5D6A7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: rgba(165, 214, 167, 0.2);
+            border: 2px solid #A5D6A7;
+            color: #1C1C1C;
+        }
+
+        .alert-error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #f44336;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="80,200 200,120 320,200" fill="#CD853F" stroke="#B8763F" stroke-width="3"/>
+                    <polygon points="300,185 320,185 320,200 300,200" fill="#CD853F"/>
+                    <rect x="90" y="200" width="220" height="120" fill="white" stroke="#ddd" stroke-width="2"/>
+                    <circle cx="200" cy="240" r="20" fill="#7CB342"/>
+                    <ellipse cx="200" cy="270" rx="25" ry="35" fill="#7CB342"/>
+                    <line x1="175" y1="250" x2="160" y2="220" stroke="#7CB342" stroke-width="8" stroke-linecap="round"/>
+                    <line x1="225" y1="250" x2="240" y2="220" stroke="#7CB342" stroke-width="8" stroke-linecap="round"/>
+                    <line x1="185" y1="300" x2="175" y2="330" stroke="#7CB342" stroke-width="8" stroke-linecap="round"/>
+                    <line x1="215" y1="300" x2="225" y2="330" stroke="#7CB342" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="140" cy="250" r="15" fill="#7CB342"/>
+                    <ellipse cx="140" cy="275" rx="18" ry="25" fill="#7CB342"/>
+                    <line x1="125" y1="285" x2="115" y2="310" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="155" y1="285" x2="165" y2="310" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="128" y1="265" x2="110" y2="275" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="152" y1="265" x2="170" y2="275" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="260" cy="250" r="15" fill="#7CB342"/>
+                    <ellipse cx="260" cy="275" rx="18" ry="25" fill="#7CB342"/>
+                    <line x1="245" y1="285" x2="235" y2="310" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="275" y1="285" x2="285" y2="310" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="248" y1="265" x2="230" y2="275" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="272" y1="265" x2="290" y2="275" stroke="#7CB342" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="200" cy="350" r="12" fill="#1C1C1C"/>
+                    <ellipse cx="200" cy="375" rx="15" ry="20" fill="#1C1C1C"/>
+                    <line x1="185" y1="365" x2="160" y2="375" stroke="#1C1C1C" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="215" y1="365" x2="240" y2="375" stroke="#1C1C1C" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="190" y1="390" x2="185" y2="405" stroke="#1C1C1C" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="210" y1="390" x2="215" y2="405" stroke="#1C1C1C" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+                COVINICH
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="acercade.html">Acerca De</a></li>
+                <li><a href="#">Noticias</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">???</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="social-icons">
+                    <a href="https://www.facebook.com/Covinich2017/" target="_blank" title="Facebook">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                    </a>
+                    <a href="https://www.instagram.com/co.vi.nich/?hl=es-la" target="_blank" title="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+   
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <svg class="auth-logo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="80,200 200,120 320,200" fill="#CD853F" stroke="#B8763F" stroke-width="3"/>
+                    <polygon points="300,185 320,185 320,200 300,200" fill="#CD853F"/>
+                    <rect x="90" y="200" width="220" height="120" fill="white" stroke="#ddd" stroke-width="2"/>
+                    <circle cx="200" cy="240" r="20" fill="#7CB342"/>
+                    <ellipse cx="200" cy="270" rx="25" ry="35" fill="#7CB342"/>
+                </svg>
+                <h1 class="auth-title">COVINICH</h1>
+                <p class="auth-subtitle">Cooperativa de Viviendas</p>
+            </div>
+
+            <div class="form-tabs">
+                <button class="tab-button active" onclick="showTab('login')">Iniciar Sesion</button>
+                <button class="tab-button" onclick="showTab('register')">Registrarse</button>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <div class="form-container">
+              
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login_email" class="form-label">Email</label>
+                        <input type="email" id="login_email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login_password" class="form-label">Contrasenia</label>
+                        <input type="password" id="login_password" class="form-input" required>
+                    </div>
+                    <button type="submit" class="submit-button">Iniciar Sesion</button>
+                </form>
+
+                
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="register_name" class="form-label">Nombre Completo</label>
+                        <input type="text" id="register_name" class="form-input" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register_email" class="form-label">Email</label>
+                            <input type="email" id="register_email" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register_age" class="form-label">Edad</label>
+                            <input type="number" id="register_age" class="form-input" min="18" max="100" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register_password" class="form-label">Contrasenia</label>
+                        <input type="password" id="register_password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register_image" class="form-label">Foto de Perfil</label>
+                        <div class="file-input-wrapper">
+                            <button type="button" class="file-input-button" onclick="document.getElementById('register_image').click()">
+                                <span id="file-button-text">Seleccionar Imagen</span>
+                            </button>
+                            <input type="file" id="register_image" class="file-input" accept="image/*" required>
+                        </div>
+                        <div id="imagePreview" class="file-preview"></div>
+                    </div>
+                    <button type="submit" class="submit-button">Crear Cuenta</button>
+                </form>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Procesando...</p>
+            </div>
+
+            <div class="back-link">
+                <a href="index.html">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      
+        function showTab(tabName) {
+           
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+          
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            document.getElementById(tabName + 'Form').classList.add('active');
+            
+          
+            clearAlerts();
+        }
+
+    
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function clearAlerts() {
+            document.getElementById('alertContainer').innerHTML = '';
+        }
+
+      
+        function toggleLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.querySelectorAll('.submit-button').forEach(btn => {
+                btn.disabled = show;
+            });
+        }
+
+       
+        document.getElementById('register_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            const buttonText = document.getElementById('file-button-text');
+            
+            if (file) {
+                buttonText.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                buttonText.textContent = 'Seleccionar Imagen';
+                preview.innerHTML = '';
+            }
+        });
+
+      
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearAlerts();
+            toggleLoading(true);
+            
+            const data = {
+                usr_email: document.getElementById('login_email').value,
+                usr_pass: document.getElementById('login_password').value
+            };
+
+            fetch('api.php/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                toggleLoading(false);
+                if (data.success) {
+                    showAlert('Â¡Inicio de sesiÃ³n exitoso! Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showAlert(data.error || 'Error al iniciar sesiÃ³n');
+                }
+            })
+            .catch(error => {
+                toggleLoading(false);
+                showAlert('Error de conexiÃ³n. Intenta nuevamente.');
+                console.error('Error:', error);
+            });
+        });
+
+      
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearAlerts();
+            
+            const fileInput = document.getElementById('register_image');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('Por favor selecciona una imagen de perfil');
+                return;
+            }
+            
+            toggleLoading(true);
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const data = {
+                    usr_name: document.getElementById('register_name').value,
+                    usr_email: document.getElementById('register_email').value,
+                    usr_age: document.getElementById('register_age').value,
+                    usr_pass: document.getElementById('register_password').value,
+                    imagen: event.target.result
+                };
+
+                fetch('api.php/usuarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(false);
+                    if (data.success) {
+                        showAlert('Â¡Usuario registrado correctamente! Ahora puedes iniciar sesiÃ³n.', 'success');
+                       
+                        document.getElementById('registerForm').reset();
+                        document.getElementById('imagePreview').innerHTML = '';
+                        document.getElementById('file-button-text').textContent = 'Seleccionar Imagen';
+                        
+                        setTimeout(() => {
+                            document.querySelector('[onclick="showTab(\'login\')"]').click();
+                        }, 2000);
+                    } else {
+                        showAlert(data.error || 'Error al registrar usuario');
+                    }
+                })
+                .catch(error => {
+                    toggleLoading(false);
+                    showAlert('Error de conexiÃ³n. Intenta nuevamente.');
+                    console.error('Error:', error);
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+
+        
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(28, 28, 28, 0.98)';
+            } else {
+                header.style.background = 'rgba(28, 28, 28, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

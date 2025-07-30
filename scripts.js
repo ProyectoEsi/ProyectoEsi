@@ -28,10 +28,7 @@ document.querySelector('.contact-form').addEventListener('submit', function(e) {
 });
 
 
-document.querySelector('.login-button').addEventListener('click', function(e) {
-    e.preventDefault();
-    alert('Funcionalidad de inicio de sesión en desarrollo');
-});
+
 
 
 document.querySelectorAll('.news-button').forEach(button => {
