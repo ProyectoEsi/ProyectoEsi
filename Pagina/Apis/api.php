@@ -1,7 +1,7 @@
 <?php
-/* API RESTful para gestionar usuarios
+/* API RESTful para gestionar socios
  * Permite operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
- * Requiere conexión a una base de datos MySQL
+ * Actualizado para usar la nueva base de datos bd_LogicSpark
  */
 
 // Importa las dependencias necesarias
@@ -21,19 +21,19 @@ header('Content-Type: application/json');
 switch ($method) {
 	case 'GET':
 		if($endpoint === '/usuarios'){
-			// Obtiene todos los usuarios
+			// Obtiene todos los socios
 			$usuarios = $usuarioObj->getAllUsuarios();
 			echo json_encode($usuarios);
 		} elseif (preg_match('/^\/usuarios\/(\d+)$/', $endpoint, $matches)) {
-			// Obtiene un usuario por ID
-			$usuarioId = $matches[1];
-			$usuario = $usuarioObj->getUsuarioById($usuarioId);
+			// Obtiene un socio por Cedula
+			$cedulaSocio = $matches[1];
+			$usuario = $usuarioObj->getUsuarioById($cedulaSocio);
 			echo json_encode($usuario);
 		}
 		break;
 	case 'POST':
 		if($endpoint === '/usuarios'){
-			// Añade un nuevo usuario
+			// Añade un nuevo socio
 			$data = json_decode(file_get_contents('php://input'), true);
 			$result = $usuarioObj->addUsuario($data);
 			if ($result === true) {
@@ -41,11 +41,11 @@ switch ($method) {
 				echo json_encode(['success' => $result]);
 			}else{
 				http_response_code(400);
-				echo json_encode(['error' => 'Datos incompletos o error al registrar usuario']);
+				echo json_encode(['error' => 'Datos incompletos o error al registrar socio']);
 			}
 		}elseif ($endpoint === '/login') {
 			$data = json_decode(file_get_contents('php://input'), true);
-			$result = $usuarioObj->loginUsuario($data['usr_email'], $data['usr_pass']);
+			$result = $usuarioObj->loginUsuario($data['Email'], $data['contrasena']);
 			if ($result != false) {
 				echo json_encode(['success' => true, 'usuario' => $result]);
 			} else {
@@ -56,18 +56,18 @@ switch ($method) {
 		break;
 	case 'PUT':
 		if (preg_match('/^\/usuarios\/(\d+)$/', $endpoint, $matches)) {
-			// Actualiza un usuario por ID
-			$usuarioId = $matches[1];
+			// Actualiza un socio por Cedula
+			$cedulaSocio = $matches[1];
 			parse_str(file_get_contents('php://input'), $data);
-			$result = $usuarioObj->updateUsuario($usuarioId, $data);
+			$result = $usuarioObj->updateUsuario($cedulaSocio, $data);
 			echo json_encode(['success' => $result]);
 		}
 		break;
 	case 'DELETE':
 		if (preg_match('/^\/usuarios\/(\d+)$/', $endpoint, $matches)) {
-			// Elimina un usuario por ID
-			$usuarioId = $matches[1];
-			$result = $usuarioObj->deleteUsuario($usuarioId);
+			// Elimina un socio por Cedula
+			$cedulaSocio = $matches[1];
+			$result = $usuarioObj->deleteUsuario($cedulaSocio);
 			echo json_encode(['success' => $result]);
 		}
 		break;

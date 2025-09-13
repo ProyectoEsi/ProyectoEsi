@@ -387,7 +387,6 @@
     </style>
 </head>
 <body>
-   
     <header class="header">
         <nav class="nav">
             <div class="logo">
@@ -446,7 +445,6 @@
         </nav>
     </header>
 
-   
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
@@ -462,45 +460,49 @@
             </div>
 
             <div class="form-tabs">
-                <button class="tab-button active" onclick="showTab('login')">Iniciar Sesion</button>
+                <button class="tab-button active" onclick="showTab('login')">Iniciar Sesión</button>
                 <button class="tab-button" onclick="showTab('register')">Registrarse</button>
             </div>
 
             <div id="alertContainer"></div>
 
             <div class="form-container">
-              
+                <!-- Formulario de Login -->
                 <form id="loginForm" class="auth-form active">
                     <div class="form-group">
                         <label for="login_email" class="form-label">Email</label>
                         <input type="email" id="login_email" class="form-input" required>
                     </div>
                     <div class="form-group">
-                        <label for="login_password" class="form-label">Contrasenia</label>
+                        <label for="login_password" class="form-label">Contraseña</label>
                         <input type="password" id="login_password" class="form-input" required>
                     </div>
-                    <button type="submit" class="submit-button">Iniciar Sesion</button>
+                    <button type="submit" class="submit-button">Iniciar Sesión</button>
                 </form>
 
-                
+                <!-- Formulario de Registro -->
                 <form id="registerForm" class="auth-form">
                     <div class="form-group">
                         <label for="register_name" class="form-label">Nombre Completo</label>
-                        <input type="text" id="register_name" class="form-input" required>
+                        <input type="text" id="register_name" class="form-input" placeholder="Ej: Juan Pérez González" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register_cedula" class="form-label">Cédula</label>
+                        <input type="number" id="register_cedula" class="form-input" placeholder="12345678" required>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="register_email" class="form-label">Email</label>
-                            <input type="email" id="register_email" class="form-input" required>
+                            <input type="email" id="register_email" class="form-input" placeholder="ejemplo@email.com" required>
                         </div>
                         <div class="form-group">
                             <label for="register_age" class="form-label">Edad</label>
-                            <input type="number" id="register_age" class="form-input" min="18" max="100" required>
+                            <input type="number" id="register_age" class="form-input" min="18" max="100" placeholder="25" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="register_password" class="form-label">Contrasenia</label>
-                        <input type="password" id="register_password" class="form-input" required>
+                        <label for="register_password" class="form-label">Contraseña</label>
+                        <input type="password" id="register_password" class="form-input" placeholder="Mínimo 6 caracteres" required>
                     </div>
                     <div class="form-group">
                         <label for="register_image" class="form-label">Foto de Perfil</label>
@@ -528,21 +530,16 @@
     </div>
 
     <script>
-      
         function showTab(tabName) {
-           
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-          
             document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
             document.getElementById(tabName + 'Form').classList.add('active');
             
-          
             clearAlerts();
         }
 
-    
         function showAlert(message, type = 'error') {
             const alertContainer = document.getElementById('alertContainer');
             const alert = document.createElement('div');
@@ -550,7 +547,6 @@
             alert.textContent = message;
             alertContainer.innerHTML = '';
             alertContainer.appendChild(alert);
-            
             
             setTimeout(() => {
                 alert.remove();
@@ -561,7 +557,6 @@
             document.getElementById('alertContainer').innerHTML = '';
         }
 
-      
         function toggleLoading(show) {
             document.getElementById('loading').style.display = show ? 'block' : 'none';
             document.querySelectorAll('.submit-button').forEach(btn => {
@@ -569,7 +564,6 @@
             });
         }
 
-       
         document.getElementById('register_image').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const preview = document.getElementById('imagePreview');
@@ -588,15 +582,14 @@
             }
         });
 
-      
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             clearAlerts();
             toggleLoading(true);
             
             const data = {
-                usr_email: document.getElementById('login_email').value,
-                usr_pass: document.getElementById('login_password').value
+                Email: document.getElementById('login_email').value,
+                contrasena: document.getElementById('login_password').value
             };
 
             fetch('api.php/login', {
@@ -610,22 +603,21 @@
             .then(data => {
                 toggleLoading(false);
                 if (data.success) {
-                    showAlert('Â¡Inicio de sesiÃ³n exitoso! Redirigiendo...', 'success');
+                    showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 2000);
                 } else {
-                    showAlert(data.error || 'Error al iniciar sesiÃ³n');
+                    showAlert(data.error || 'Error al iniciar sesión');
                 }
             })
             .catch(error => {
                 toggleLoading(false);
-                showAlert('Error de conexiÃ³n. Intenta nuevamente.');
+                showAlert('Error de conexión. Intenta nuevamente.');
                 console.error('Error:', error);
             });
         });
 
-      
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             clearAlerts();
@@ -643,11 +635,13 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 const data = {
-                    usr_name: document.getElementById('register_name').value,
-                    usr_email: document.getElementById('register_email').value,
-                    usr_age: document.getElementById('register_age').value,
-                    usr_pass: document.getElementById('register_password').value,
-                    imagen: event.target.result
+                    nombre_completo: document.getElementById('register_name').value,
+                    cedula: document.getElementById('register_cedula').value,
+                    Email: document.getElementById('register_email').value,
+                    Edad: document.getElementById('register_age').value,
+                    contrasena: document.getElementById('register_password').value,
+                    FotoDePerfil: event.target.result,
+                    Aceptado: false
                 };
 
                 fetch('Apis/api.php/usuarios', {
@@ -661,8 +655,8 @@
                 .then(data => {
                     toggleLoading(false);
                     if (data.success) {
-                        showAlert('Â¡Usuario registrado correctamente! Ahora puedes iniciar sesiÃ³n.', 'success');
-                       
+                        showAlert('¡Usuario registrado correctamente! Ahora puedes iniciar sesión.', 'success');
+                        
                         document.getElementById('registerForm').reset();
                         document.getElementById('imagePreview').innerHTML = '';
                         document.getElementById('file-button-text').textContent = 'Seleccionar Imagen';
@@ -676,14 +670,13 @@
                 })
                 .catch(error => {
                     toggleLoading(false);
-                    showAlert('Error de conexiÃ³n. Intenta nuevamente.');
+                    showAlert('Error de conexión. Intenta nuevamente.');
                     console.error('Error:', error);
                 });
             };
             reader.readAsDataURL(file);
         });
 
-        
         window.addEventListener('scroll', function() {
             const header = document.querySelector('.header');
             if (window.scrollY > 100) {

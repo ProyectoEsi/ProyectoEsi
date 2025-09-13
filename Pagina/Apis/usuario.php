@@ -2,6 +2,7 @@
 /* Clase usuario para gestionar con API RESTful
  * Permite operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
  * Requiere conexión a una base de datos MySQL
+ * Actualizado para usar la tabla Socios en bd_LogicSpark
  */
 
 // Configuracion del reporte de errores
@@ -18,11 +19,11 @@ class Usuario
 		$this->conn = $conn;
 	}
 
-	// Métodos para manejar usuarios
-	// Obtener todos los usuarios
+	// Métodos para manejar usuarios (socios)
+	// Obtener todos los socios
 	public function getAllUsuarios()
 	{
-		$query = "SELECT * FROM usuario";
+		$query = "SELECT * FROM Socios";
 		$result = mysqli_query($this->conn, $query);
 		$usuarios = [];
 		while($row = mysqli_fetch_assoc($result)) {
@@ -30,27 +31,33 @@ class Usuario
 		}
 		return $usuarios;
 	}
-	// Obtener un usuario por ID
-	public function getUsuarioById($id)
+	
+	// Obtener un socio por Cedula
+	public function getUsuarioById($cedula)
 	{
-		$query = "SELECT * FROM usuario WHERE id = $id ";
+		$query = "SELECT * FROM Socios WHERE Cedula = $cedula";
 		$result = mysqli_query($this->conn, $query);
 		$usuario = mysqli_fetch_assoc($result);
 		return $usuario;
 	}
-	// Agregar un nuevo usuario
+	
+	// Agregar un nuevo socio
 	public function addUsuario($data)
 	{
-		if(!isset($data['usr_name']) || !isset($data['imagen']) || !isset($data['usr_email']) || !isset($data['usr_pass']) || !isset($data['usr_age'])) {
+		if(!isset($data['cedula']) || !isset($data['FotoDePerfil']) || !isset($data['Email']) || !isset($data['contrasena']) || !isset($data['Edad'])) {
 			http_response_code(400);
 			echo json_encode(["error" => "Datos incompletos"]);
 		}else{
-			$usr_name = $data['usr_name'];
-			$usr_email = $data['usr_email'];
-			$usr_age = $data['usr_age'];
-			$usr_pass = password_hash($data['usr_pass'], PASSWORD_DEFAULT);
+			$cedula = $data['cedula'];
+			$email = $data['Email'];
+			$edad = $data['Edad'];
+			$contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
+			$ntelefono = isset($data['Ntelefono']) ? $data['Ntelefono'] : null;
+			$aporteInicial = isset($data['AporteInicial']) ? $data['AporteInicial'] : null;
+			$aceptado = isset($data['Aceptado']) ? $data['Aceptado'] : false;
+			
 			// Procesar imagen base64
-			$img_data = $data['imagen'];
+			$img_data = $data['FotoDePerfil'];
 			if (preg_match('/^data:image\/(\w+);base64,/', $img_data, $type)) {
 				$img_data = substr($img_data, strpos($img_data, ',') + 1);
 				$img_data = base64_decode($img_data);
@@ -70,7 +77,12 @@ class Usuario
 				echo json_encode(["error" => "Formato de imagen inválido"]);
 				exit;
 			}
-			$query = "INSERT INTO usuario (usr_name, usr_email, usr_age, usr_pass, imagen) VALUES ('$usr_name', '$usr_email', '$usr_age', '$usr_pass', '$img_name')";
+			
+			$query = "INSERT INTO Socios (Cedula, Email, Edad, FotoDePerfil, contrasena, Ntelefono, AporteInicial, Aceptado) 
+					  VALUES ('$cedula', '$email', '$edad', '$img_name', '$contrasena', " . 
+					  ($ntelefono ? "'$ntelefono'" : "NULL") . ", " . 
+					  ($aporteInicial ? "'$aporteInicial'" : "NULL") . ", '$aceptado')";
+			
 			$result = mysqli_query($this->conn, $query);
 			if($result){
 				return true;
@@ -81,14 +93,13 @@ class Usuario
 	}
 
 	// Iniciar sesión de usuario
-	public function loginUsuario($usr_email, $usr_pass)
+	public function loginUsuario($email, $contrasena)
 	{
-		//echo "email: $usr_email, pass: $usr_pass";
-		$query = "SELECT * FROM usuario WHERE usr_email = '$usr_email'";
+		$query = "SELECT * FROM Socios WHERE Email = '$email'";
 		$result = mysqli_query($this->conn, $query);
 		if(mysqli_num_rows($result) > 0){
 			$usuario = mysqli_fetch_assoc($result);
-			if(password_verify($usr_pass, $usuario['usr_pass'])){
+			if(password_verify($contrasena, $usuario['contrasena'])){
 				return $usuario; // Retorna el usuario si las credenciales son correctas
 			} else {
 				return false; // Contraseña incorrecta
@@ -98,19 +109,26 @@ class Usuario
 		}
 	}
 
-	// Actualizar un usuario por ID
-	public function updateUsuario($id, $data)
+	// Actualizar un socio por Cedula
+	public function updateUsuario($cedula, $data)
 	{
-		$usr_name = $data['usr_name'];
-		$usr_email = $data['usr_email'];
-		$usr_age = isset($data['usr_age']) ? $data['usr_age'] : null;
-		$usr_pass = password_hash($data['usr_pass'], PASSWORD_DEFAULT);
+		$email = $data['Email'];
+		$nombreCompleto = isset($data['nombre_completo']) ? $data['nombre_completo'] : null;
+		$edad = isset($data['Edad']) ? $data['Edad'] : null;
+		$contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
+		$ntelefono = isset($data['Ntelefono']) ? $data['Ntelefono'] : null;
+		$aporteInicial = isset($data['AporteInicial']) ? $data['AporteInicial'] : null;
+		$aceptado = isset($data['Aceptado']) ? $data['Aceptado'] : null;
 		
-		if($usr_age !== null){
-			$query = "UPDATE usuario SET usr_name = '$usr_name', usr_email = '$usr_email', usr_age = '$usr_age', usr_pass = '$usr_pass' WHERE id = ".$id;
-		} else {
-			$query = "UPDATE usuario SET usr_name = '$usr_name', usr_email = '$usr_email', usr_pass = '$usr_pass' WHERE id = ".$id;
-		}
+		$query = "UPDATE Socios SET Email = '$email', contrasena = '$contrasena'";
+		
+		if($nombreCompleto !== null) $query .= ", NombreCompleto = '$nombreCompleto'";
+		if($edad !== null) $query .= ", Edad = '$edad'";
+		if($ntelefono !== null) $query .= ", Ntelefono = '$ntelefono'";
+		if($aporteInicial !== null) $query .= ", AporteInicial = '$aporteInicial'";
+		if($aceptado !== null) $query .= ", Aceptado = '$aceptado'";
+		
+		$query .= " WHERE Cedula = $cedula";
 		
 		$result = mysqli_query($this->conn, $query);
 		if($result){
@@ -119,10 +137,11 @@ class Usuario
 			return false;
 		}
 	}
-	// Eliminar un usuario por ID
-	public function deleteUsuario($id)
+	
+	// Eliminar un socio por Cedula
+	public function deleteUsuario($cedula)
 	{
-		$query = "DELETE FROM usuario WHERE id = ".$id;
+		$query = "DELETE FROM Socios WHERE Cedula = $cedula";
 		$result = mysqli_query($this->conn, $query);
 		if($result){
 			return true;
