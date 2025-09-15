@@ -1,26 +1,14 @@
 <?php
-/* Clase usuario para gestionar con API RESTful
- * Permite operaciones CRUD (Crear, Leer, Actualizar, Eliminar)
- * Requiere conexión a una base de datos MySQL
- * Actualizado para usar la tabla Socios en bd_LogicSpark
- */
-
-// Configuracion del reporte de errores
 error_reporting(E_ERROR | E_PARSE);
 ini_set('display_errors', 0);
 
 class Usuario
 {
 	private $conn;
-
-	// Constructor que recibe la conexión a la base de datos
 	public function __construct($conn)
 	{
 		$this->conn = $conn;
 	}
-
-	// Métodos para manejar usuarios (socios)
-	// Obtener todos los socios
 	public function getAllUsuarios()
 	{
 		$query = "SELECT * FROM Socios";
@@ -31,8 +19,6 @@ class Usuario
 		}
 		return $usuarios;
 	}
-	
-	// Obtener un socio por Cedula
 	public function getUsuarioById($cedula)
 	{
 		$query = "SELECT * FROM Socios WHERE Cedula = $cedula";
@@ -40,23 +26,20 @@ class Usuario
 		$usuario = mysqli_fetch_assoc($result);
 		return $usuario;
 	}
-	
-	// Agregar un nuevo socio
 	public function addUsuario($data)
 	{
-		if(!isset($data['cedula']) || !isset($data['FotoDePerfil']) || !isset($data['Email']) || !isset($data['contrasena']) || !isset($data['Edad'])) {
+		if(!isset($data['cedula']) || !isset($data['FotoDePerfil']) || !isset($data['Email']) || !isset($data['contrasena']) || !isset($data['Edad']) || !isset($data['nombre_completo'])) {
 			http_response_code(400);
 			echo json_encode(["error" => "Datos incompletos"]);
 		}else{
 			$cedula = $data['cedula'];
+			$nombreCompleto = $data['nombre_completo'];
 			$email = $data['Email'];
 			$edad = $data['Edad'];
 			$contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
 			$ntelefono = isset($data['Ntelefono']) ? $data['Ntelefono'] : null;
 			$aporteInicial = isset($data['AporteInicial']) ? $data['AporteInicial'] : null;
 			$aceptado = isset($data['Aceptado']) ? $data['Aceptado'] : false;
-			
-			// Procesar imagen base64
 			$img_data = $data['FotoDePerfil'];
 			if (preg_match('/^data:image\/(\w+);base64,/', $img_data, $type)) {
 				$img_data = substr($img_data, strpos($img_data, ',') + 1);
@@ -78,8 +61,8 @@ class Usuario
 				exit;
 			}
 			
-			$query = "INSERT INTO Socios (Cedula, Email, Edad, FotoDePerfil, contrasena, Ntelefono, AporteInicial, Aceptado) 
-					  VALUES ('$cedula', '$email', '$edad', '$img_name', '$contrasena', " . 
+			$query = "INSERT INTO Socios (Cedula, NombreCompleto, Email, Edad, FotoDePerfil, contrasena, Ntelefono, AporteInicial, Aceptado) 
+					  VALUES ('$cedula', '$nombreCompleto', '$email', '$edad', '$img_name', '$contrasena', " . 
 					  ($ntelefono ? "'$ntelefono'" : "NULL") . ", " . 
 					  ($aporteInicial ? "'$aporteInicial'" : "NULL") . ", '$aceptado')";
 			
@@ -91,8 +74,6 @@ class Usuario
 			}
 		}
 	}
-
-	// Iniciar sesión de usuario
 	public function loginUsuario($email, $contrasena)
 	{
 		$query = "SELECT * FROM Socios WHERE Email = '$email'";
@@ -100,36 +81,56 @@ class Usuario
 		if(mysqli_num_rows($result) > 0){
 			$usuario = mysqli_fetch_assoc($result);
 			if(password_verify($contrasena, $usuario['contrasena'])){
-				return $usuario; // Retorna el usuario si las credenciales son correctas
+				$accepted = ($usuario['Aceptado'] === 1 || $usuario['Aceptado'] === '1' || strtolower((string)$usuario['Aceptado']) === 'true');
+				if ($accepted) {
+					return $usuario;
+				} else {
+					return 'not_accepted';
+				}
 			} else {
-				return false; // Contraseña incorrecta
+				return false;
 			}
 		} else {
-			return false; // Usuario no encontrado
+			return false;
 		}
 	}
-
-	// Actualizar un socio por Cedula
 	public function updateUsuario($cedula, $data)
 	{
-		$email = $data['Email'];
-		$nombreCompleto = isset($data['nombre_completo']) ? $data['nombre_completo'] : null;
-		$edad = isset($data['Edad']) ? $data['Edad'] : null;
-		$contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
-		$ntelefono = isset($data['Ntelefono']) ? $data['Ntelefono'] : null;
-		$aporteInicial = isset($data['AporteInicial']) ? $data['AporteInicial'] : null;
-		$aceptado = isset($data['Aceptado']) ? $data['Aceptado'] : null;
-		
-		$query = "UPDATE Socios SET Email = '$email', contrasena = '$contrasena'";
-		
-		if($nombreCompleto !== null) $query .= ", NombreCompleto = '$nombreCompleto'";
-		if($edad !== null) $query .= ", Edad = '$edad'";
-		if($ntelefono !== null) $query .= ", Ntelefono = '$ntelefono'";
-		if($aporteInicial !== null) $query .= ", AporteInicial = '$aporteInicial'";
-		if($aceptado !== null) $query .= ", Aceptado = '$aceptado'";
-		
-		$query .= " WHERE Cedula = $cedula";
-		
+		$sets = [];
+		if (isset($data['Email'])) {
+			$email = $data['Email'];
+			$sets[] = "Email = '$email'";
+		}
+		if (isset($data['contrasena'])) {
+			$contrasena = password_hash($data['contrasena'], PASSWORD_DEFAULT);
+			$sets[] = "contrasena = '$contrasena'";
+		}
+		if (isset($data['nombre_completo'])) {
+			$nombreCompleto = $data['nombre_completo'];
+			$sets[] = "NombreCompleto = '$nombreCompleto'";
+		}
+		if (isset($data['Edad'])) {
+			$edad = $data['Edad'];
+			$sets[] = "Edad = '$edad'";
+		}
+		if (isset($data['Ntelefono'])) {
+			$ntelefono = $data['Ntelefono'];
+			$sets[] = "Ntelefono = '$ntelefono'";
+		}
+		if (isset($data['AporteInicial'])) {
+			$aporteInicial = $data['AporteInicial'];
+			$sets[] = "AporteInicial = '$aporteInicial'";
+		}
+		if (isset($data['Aceptado'])) {
+			$aceptado = $data['Aceptado'] ? 1 : 0;
+			$sets[] = "Aceptado = '$aceptado'";
+		}
+
+		if (count($sets) === 0) {
+			return false;
+		}
+
+		$query = "UPDATE Socios SET " . implode(", ", $sets) . " WHERE Cedula = $cedula";
 		$result = mysqli_query($this->conn, $query);
 		if($result){
 			return true;
@@ -137,8 +138,6 @@ class Usuario
 			return false;
 		}
 	}
-	
-	// Eliminar un socio por Cedula
 	public function deleteUsuario($cedula)
 	{
 		$query = "DELETE FROM Socios WHERE Cedula = $cedula";
@@ -148,6 +147,54 @@ class Usuario
 		} else {
 			return false;
 		}
+	}
+
+	public function loginAdmin($perfil, $contrasena)
+	{
+		$query = "SELECT * FROM Administradores WHERE Perfil = '$perfil'";
+		$result = mysqli_query($this->conn, $query);
+		if(mysqli_num_rows($result) > 0){
+			$admin = mysqli_fetch_assoc($result);
+			if(password_verify($contrasena, $admin['contrasena']) || $contrasena === $admin['contrasena']){
+				return $admin;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	public function assignUnidadHabitacional($cedulaSocio, $numeroHabitacion)
+	{
+		$check = mysqli_query($this->conn, "SELECT Aceptado FROM Socios WHERE Cedula = " . (int)$cedulaSocio);
+		if (!$check || mysqli_num_rows($check) === 0) {
+			return false;
+		}
+		$row = mysqli_fetch_assoc($check);
+		$accepted = ($row['Aceptado'] === 1 || $row['Aceptado'] === '1' || strtolower((string)$row['Aceptado']) === 'true');
+		if (!$accepted) {
+			return false;
+		}
+		$exists = mysqli_query($this->conn, "SELECT CeduladelSocio FROM UnidadHabitacional WHERE CeduladelSocio = " . (int)$cedulaSocio);
+		if ($exists && mysqli_num_rows($exists) > 0) {
+			$q = "UPDATE UnidadHabitacional SET NumeroDeHabitacion = '" . (int)$numeroHabitacion . "' WHERE CeduladelSocio = " . (int)$cedulaSocio;
+			return mysqli_query($this->conn, $q) ? true : false;
+		} else {
+			$q = "INSERT INTO UnidadHabitacional (CeduladelSocio, NumeroDeHabitacion) VALUES ('" . (int)$cedulaSocio . "', '" . (int)$numeroHabitacion . "')";
+			return mysqli_query($this->conn, $q) ? true : false;
+		}
+	}
+
+	public function getUnidadesHabitacionales()
+	{
+		$query = "SELECT CeduladelSocio, NumeroDeHabitacion FROM UnidadHabitacional";
+		$result = mysqli_query($this->conn, $query);
+		$unidades = [];
+		while ($row = mysqli_fetch_assoc($result)) {
+			$unidades[] = $row;
+		}
+		return $unidades;
 	}
 }
 ?>

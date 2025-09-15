@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-09-2025 a las 19:20:57
+-- Tiempo de generación: 15-09-2025 a las 15:42:03
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -31,6 +31,14 @@ CREATE TABLE `administradores` (
   `Perfil` varchar(100) NOT NULL,
   `contrasena` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `administradores`
+--
+
+INSERT INTO `administradores` (`Perfil`, `contrasena`) VALUES
+('admin', '$2y$10$S4wNBH3m1a2bP1o3vO3uU.3f1rZ5b8m7Gf8eW6tQ0mCwqjO1m2ZxK'),
+('admin1', 'admin123');
 
 -- --------------------------------------------------------
 
@@ -66,7 +74,8 @@ CREATE TABLE `socios` (
 --
 
 INSERT INTO `socios` (`Cedula`, `NombreCompleto`, `Email`, `Edad`, `FotoDePerfil`, `AporteInicial`, `contrasena`, `Ntelefono`, `Aceptado`) VALUES
-(59617080, '', 'Thiago@gmail.com', '19', 0x363863356137323532333262382e6a706567, NULL, '$2y$10$qIhwIOjQm7DT8k.FsY.u5OjPA0hJ15WNAauHU/udFuLrCOwZjjOeK', NULL, 0);
+(3232132, 'Eliass Salaverria', 'Eliass@gmail.com', '36', 0x363863376664306165613532332e6a706567, NULL, '$2y$10$avG354Ql7.snZ9KMkvoy8OVFM.xWBok0cvVKbaR8dh8nc4WNMjiRq', 5964157, 1),
+(54213121, 'Santiago Cacola', 'Miles@gmail.com', '23', 0x363863376665363262396531662e6a706567, NULL, '$2y$10$0A/sBZ5R9wZVckEE9akZ6u7PorpmvZ3xqxRUJtui.kf97s00aZxdO', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -93,6 +102,14 @@ CREATE TABLE `unidadhabitacional` (
   `ComprobantedePago` blob DEFAULT NULL,
   `ValidoInvalido` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `unidadhabitacional`
+--
+
+INSERT INTO `unidadhabitacional` (`CeduladelSocio`, `NumeroDeHabitacion`, `HorasSemanales`, `Completadas`, `ComprobantedePago`, `ValidoInvalido`) VALUES
+(3232132, 2, NULL, NULL, NULL, NULL),
+(54213121, 3, NULL, NULL, NULL, NULL);
 
 --
 -- Índices para tablas volcadas

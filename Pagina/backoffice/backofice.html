@@ -1,178 +1,393 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backoffice Admin - F.A.N.S Cooperativa</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="icon" type="image/png" href="../imagenes/4.png">
+    <title>Backoffice - COVINICH</title>
     <style>
-        /* Estilos específicos del Backoffice para evitar sobrecargar style.css */
-        .backoffice-section {
-            padding: 2rem 0;
-            margin-top: 80px; /* Para el header fijo */
-            min-height: calc(100vh - 140px); /* Ajustado para footer */
-            background-color: var(--background-color);
-            transition: background-color 0.4s ease;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1C1C1C 0%, #2a2a2a 100%);
+            min-height: 100vh;
         }
-        .backoffice-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background-color: var(--card-bg);
-            padding: 3rem;
-            border-radius: 15px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-        .backoffice-title {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            color: var(--primary-color);
-        }
-        .user-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 2rem;
-            text-align: left;
-        }
-        .user-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--section-bg-secondary);
-            padding: 1rem 1.5rem;
-            margin-bottom: 0.8rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-        .user-list li:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .user-details {
-            flex-grow: 1;
-        }
-        .user-name {
-            font-weight: 600;
-            color: var(--dark-text);
-            font-size: 1.1rem;
-        }
-        .user-email, .user-date {
-            display: block;
-            color: var(--medium-text);
-            font-size: 0.9rem;
-            margin-top: 0.2rem;
-        }
-        .btn-approve {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 0.6rem 1.2rem;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-approve:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-1px);
-        }
-        .no-pending-users {
-            color: var(--medium-text);
-            font-style: italic;
-            padding: 2rem;
-        }
+        .header { position: fixed; top: 0; width: 100%; background: rgba(28, 28, 28, 0.95); backdrop-filter: blur(10px); z-index: 1000; padding: 1rem 0; transition: all 0.3s ease; }
+        .nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .logo { display: flex; align-items: center; font-weight: bold; font-size: 1.2rem; color: #F5F5DC; }
+        .logo-icon { width: 40px; height: 40px; margin-right: 0.5rem; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: #F5F5DC; text-decoration: none; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #A5D6A7; }
 
-        /* Dark Mode adjustments for Backoffice */
-        body.dark-mode .backoffice-section {
-            background-color: var(--background-color);
-        }
-        body.dark-mode .backoffice-container {
-            background-color: var(--surface-color);
-            box-shadow: var(--card-shadow);
-            border-color: var(--border-color);
-        }
-        body.dark-mode .backoffice-title {
-            color: var(--primary-color);
-        }
-        body.dark-mode .user-list li {
-            background-color: var(--input-bg); /* Un tono más oscuro */
-            border-color: var(--border-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        body.dark-mode .user-name {
-            color: var(--text-color);
-        }
-        body.dark-mode .user-email,
-        body.dark-mode .user-date,
-        body.dark-mode .no-pending-users {
-            color: var(--medium-text);
-        }
-        body.dark-mode .btn-approve {
-            background-color: var(--primary-color); /* Verde claro de dark mode */
-            color: var(--background-color); /* Texto oscuro */
-        }
-        body.dark-mode .btn-approve:hover {
-            background-color: var(--secondary-color); /* Verde pasto de dark mode */
-            color: var(--text-color); /* Texto claro */
-        }
+        .container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 8rem 2rem 4rem; position: relative; overflow: hidden; }
+        .container::before { content: ''; position: absolute; inset: 0; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(165,214,167,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(139,195,74,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(165,214,167,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>'); opacity: 0.3; }
+        .card { background: rgba(245, 245, 220, 0.95); backdrop-filter: blur(20px); border-radius: 25px; padding: 2rem; box-shadow: 0 25px 50px rgba(0,0,0,0.5); max-width: 1000px; width: 100%; position: relative; z-index: 2; }
+        .title { font-size: 2rem; color: #1C1C1C; margin-bottom: 0.5rem; font-weight: 700; text-align: center; }
+        .subtitle { color: #666; text-align: center; margin-bottom: 1rem; }
+
+        .table { width: 100%; border-collapse: collapse; border-radius: 15px; overflow: hidden; }
+        .table thead { background: linear-gradient(45deg, #A5D6A7, #8BC34A); color: #1C1C1C; }
+        .table th, .table td { padding: 0.9rem 1rem; border-bottom: 1px solid #eee; text-align: left; }
+        .table tbody tr:hover { background: rgba(165, 214, 167, 0.2); }
+        .badge { padding: 0.2rem 0.6rem; border-radius: 10px; font-size: 0.85rem; font-weight: 700; }
+        .badge-pending { background: rgba(244, 67, 54, 0.15); color: #f44336; border: 1px solid #f44336; }
+        .badge-accepted { background: rgba(165,214,167,0.2); color: #1C1C1C; border: 1px solid #A5D6A7; }
+        .btn { background: linear-gradient(45deg, #A5D6A7, #8BC34A); color: #1C1C1C; padding: 0.6rem 1rem; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(165,214,167,0.3); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .search { width: 260px; padding: 0.7rem 1rem; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; }
+        .alert { padding: 0.8rem 1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 600; text-align: center; }
+        .alert-success { background: rgba(165, 214, 167, 0.2); border: 2px solid #A5D6A7; color: #1C1C1C; }
+        .alert-error { background: rgba(244, 67, 54, 0.2); border: 2px solid #f44336; color: #f44336; }
     </style>
 </head>
-
-<body class="light-mode">
-    <header class="header" id="header">
-        <div class="container">
-            <div class="nav-brand">
-                <div class="logo">
-                    <a href="index.html" class="logo-link">
-                        <span class="logo-text">F.A.N.S</span>
-                        <span class="logo-subtitle">Admin</span> </a>
-                </div>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="../imagenes/4.png" alt="Logo" class="logo-icon">
+                COVINICH - Backoffice
             </div>
-            <nav class="navigation">
-                <ul class="nav-list">
-                    <li><a href="index.html" class="nav-link">Ir a la Web</a></li> </ul>
-            </nav>
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
-                    <span class="theme-icon">🌙</span>
-                </button>
-                </div>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
+            <ul class="nav-links">
+                <li><button id="logoutAdminBtn" class="btn" style="padding:0.4rem 0.8rem;">Cerrar sesión</button></li>
+            </ul>
+        </nav>
     </header>
 
-    <section class="backoffice-section">
-        <div class="container">
-            <div class="backoffice-container animate-on-scroll">
-                <h1 class="backoffice-title">Aprobación de Usuarios Pendientes</h1>
-                <p class="no-pending-users" id="noPendingUsersMessage">Cargando usuarios pendientes...</p>
-                <ul class="user-list" id="pendingUserList">
-                    </ul>
+    <div class="container">
+        <div class="card">
+            <h1 class="title">Usuarios pendientes</h1>
+            <p class="subtitle">Aprueba o rechaza las nuevas solicitudes</p>
+
+            <div id="alertContainer"></div>
+
+            <div class="toolbar">
+                <input id="searchInput" class="search" type="search" placeholder="Buscar por nombre, cédula o email" />
+                <button id="refreshBtn" class="btn">Actualizar</button>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Edad</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <p class="footer-text">© 2025 F.A.N.S Cooperativa de Viviendas. Todos los derechos reservados.</p>
-                <p class="footer-text">Panel de Administración.</p>
+        <div class="card" style="margin-top: 1.5rem;">
+            <h1 class="title">Unidades habitacionales</h1>
+            <p class="subtitle">Asigna un número de habitación a socios aceptados</p>
+
+            <div id="alertContainerUnits"></div>
+            <div class="toolbar">
+                <input id="searchUnits" class="search" type="search" placeholder="Buscar por nombre o cédula" />
+                <button id="refreshUnitsBtn" class="btn">Actualizar</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre</th>
+                            <th>Habitación asignada</th>
+                            <th>Asignar habitación</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unitsTableBody"></tbody>
+                </table>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="js/main.js"></script>         <script src="js/dark-mode.js"></script>
-<script src="js/auth.js"></script>          <script src="js/backoffice.js"></script>    </body>
+    <script>
+        (function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const perfil = urlParams.get('perfil');
+            
+            if (!perfil) {
+                window.location.replace('../registro.html');
+                return;
+            }
+        })();
 
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        (function(){
+            const btn = document.getElementById('logoutAdminBtn');
+            if (btn) {
+                btn.addEventListener('click', function(){
+                    window.location.replace('../registro.html');
+                });
+            }
+        })();
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+        function showAlert(message, type = 'error') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        function renderRows(usuarios) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+            if (!usuarios || usuarios.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 6;
+                td.textContent = 'No hay usuarios pendientes.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            usuarios.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.Cedula}</td>
+                    <td>${u.NombreCompleto || ''}</td>
+                    <td>${u.Email}</td>
+                    <td>${u.Edad}</td>
+                    <td>
+                        ${String(u.Aceptado) === '1' || String(u.Aceptado).toLowerCase() === 'true' ?
+                            '<span class="badge badge-accepted">Aceptado</span>' :
+                            '<span class="badge badge-pending">Pendiente</span>'}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn" ${String(u.Aceptado) === '1' || String(u.Aceptado).toLowerCase() === 'true' ? 'disabled' : ''} data-cedula="${u.Cedula}">Aceptar</button>
+                            <button class="btn" style="background: linear-gradient(45deg, #f7a4a0, #f44336);" data-reject="${u.Cedula}">Rechazar</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.querySelectorAll('button[data-cedula]').forEach(btn => {
+                btn.addEventListener('click', () => acceptUser(btn.getAttribute('data-cedula'), btn));
+            });
+
+            document.querySelectorAll('button[data-reject]').forEach(btn => {
+                btn.addEventListener('click', () => rejectUser(btn.getAttribute('data-reject'), btn));
+            });
+        }
+
+        async function fetchUsuarios() {
+            try {
+                const res = await fetch('../Apis/api.php/usuarios');
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('Respuesta inválida');
+                const pendientes = data.filter(u => !(String(u.Aceptado) === '1' || String(u.Aceptado).toLowerCase() === 'true'));
+                window.__allUsuarios = data;
+                window.__pendientes = pendientes;
+                applySearch();
+            } catch (e) {
+                showAlert('No se pudieron cargar los usuarios', 'error');
+                console.error(e);
+            }
+        }
+
+        async function acceptUser(cedula, buttonEl) {
+            try {
+                buttonEl.disabled = true;
+                const res = await fetch(`../Apis/api.php/usuarios/${cedula}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Aceptado: true })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showAlert('Usuario aceptado correctamente', 'success');
+                    fetchUsuarios();
+                } else {
+                    buttonEl.disabled = false;
+                    showAlert('No se pudo aceptar al usuario', 'error');
+                }
+            } catch (e) {
+                buttonEl.disabled = false;
+                showAlert('Error de conexión', 'error');
+                console.error(e);
+            }
+        }
+
+        async function rejectUser(cedula, buttonEl) {
+            if (!confirm('¿Seguro que deseas rechazar y eliminar este usuario?')) return;
+            try {
+                buttonEl.disabled = true;
+                const res = await fetch(`../Apis/api.php/usuarios/${cedula}`, {
+                    method: 'DELETE'
+                });
+                const result = await res.json();
+                if (result.success) {
+                    showAlert('Usuario eliminado correctamente', 'success');
+                    fetchUsuarios();
+                } else {
+                    buttonEl.disabled = false;
+                    showAlert('No se pudo eliminar al usuario', 'error');
+                }
+            } catch (e) {
+                buttonEl.disabled = false;
+                showAlert('Error de conexión', 'error');
+                console.error(e);
+            }
+        }
+
+        function applySearch() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase();
+            const list = (window.__pendientes || []).filter(u =>
+                String(u.Cedula).toLowerCase().includes(q) ||
+                (u.NombreCompleto || '').toLowerCase().includes(q) ||
+                (u.Email || '').toLowerCase().includes(q)
+            );
+            renderRows(list);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applySearch);
+        document.getElementById('refreshBtn').addEventListener('click', fetchUsuarios);
+
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            header.style.background = window.scrollY > 100 ? 'rgba(28, 28, 28, 0.98)' : 'rgba(28, 28, 28, 0.95)';
+        });
+
+        fetchUsuarios();
+
+        function showAlertUnits(message, type = 'error') {
+            const c = document.getElementById('alertContainerUnits');
+            const el = document.createElement('div');
+            el.className = `alert alert-${type}`;
+            el.textContent = message;
+            c.innerHTML = '';
+            c.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+
+        async function fetchAceptados() {
+            try {
+                const res = await fetch('../Apis/api.php/usuarios');
+                const data = await res.json();
+                const aceptados = (Array.isArray(data) ? data : []).filter(u => String(u.Aceptado) === '1' || String(u.Aceptado).toLowerCase() === 'true');
+                window.__aceptados = aceptados;
+                await fetchUnidades();
+                applyUnitsSearch();
+            } catch (e) {
+                showAlertUnits('No se pudieron cargar los socios aceptados');
+                console.error(e);
+            }
+        }
+
+        async function fetchUnidades() {
+            try {
+                const res = await fetch('../Apis/api.php/unidades');
+                const data = await res.json();  
+                const map = {};
+                (Array.isArray(data) ? data : []).forEach(u => { map[String(u.CeduladelSocio)] = u.NumeroDeHabitacion; });
+                window.__unidadesMap = map;
+            } catch (e) {
+                window.__unidadesMap = {};
+            }
+        }
+
+        function renderUnitsRows(usuarios) {
+            const tbody = document.getElementById('unitsTableBody');
+            tbody.innerHTML = '';
+            if (!usuarios || usuarios.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 3;
+                td.textContent = 'No hay socios aceptados.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+                return;
+            }
+            usuarios.forEach(u => {
+                const asignada = window.__unidadesMap ? window.__unidadesMap[String(u.Cedula)] : undefined;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.Cedula}</td>
+                    <td>${u.NombreCompleto || ''}</td>
+                    <td>${asignada ? asignada : 'Ninguna'}</td>
+                    <td>
+                        <input type="number" min="1" max="100" placeholder="N° (1-100)" style="width:110px; padding:0.4rem; border:1px solid #ddd; border-radius:8px;" />
+                        <button class="btn" data-assign="${u.Cedula}">Asignar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.querySelectorAll('button[data-assign]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const cedula = btn.getAttribute('data-assign');
+                    const input = btn.parentElement.querySelector('input[type="number"]');
+                    const numero = parseInt(input.value, 10);
+                    if (!numero || numero < 1 || numero > 100) {
+                        showAlertUnits('Ingresa un número de habitación válido (1 a 100)');
+                        return;
+                    }
+                    btn.disabled = true;
+                    try {
+                        const res = await fetch('../Apis/api.php/unidades', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ CeduladelSocio: Number(cedula), NumeroDeHabitacion: numero })
+                        });
+                        const out = await res.json();
+                        if (out && out.success) {
+                            showAlertUnits('Unidad asignada', 'success');
+                            input.value = '';
+                            await fetchUnidades();
+                            applyUnitsSearch();
+                        } else {
+                            showAlertUnits(out.error || 'No se pudo asignar la unidad');
+                        }
+                    } catch (e) {
+                        showAlertUnits('Error de conexión');
+                        console.error(e);
+                    } finally {
+                        btn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        function applyUnitsSearch() {
+            const q = (document.getElementById('searchUnits').value || '').toLowerCase();
+            const list = (window.__aceptados || []).filter(u =>
+                String(u.Cedula).toLowerCase().includes(q) || (u.NombreCompleto || '').toLowerCase().includes(q)
+            );
+            renderUnitsRows(list);
+        }
+
+        document.getElementById('searchUnits').addEventListener('input', applyUnitsSearch);
+        document.getElementById('refreshUnitsBtn').addEventListener('click', fetchAceptados);
+        fetchAceptados();
+    </script>
+</body>
 </html>

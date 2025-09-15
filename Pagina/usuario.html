@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="icon" type="image/png" href="imagenes/4.png">
+    <title>Mi cuenta - COVINICH</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/user-styles.css">
+</head>
+<body class="user-body">
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <img src="imagenes/4.png" alt="Logo" class="logo-icon">
+                COVINICH
+            </div>
+            <ul class="nav-links">
+            </ul>
+        </nav>
+    </header>
+
+    <div class="user-container">
+        <div class="user-card">
+            <h1 id="welcomeTitle" class="user-title">Bienvenido</h1>
+            <p class="user-subtitle">Este es tu espacio personal en la cooperativa</p>
+            <p id="unitInfo" class="user-subtitle" style="margin-top: 0.5rem; font-weight: 600; color: #1C1C1C;">Unidad habitacional: ...</p>
+            <img id="profileImage" class="avatar" alt="Foto de perfil" src="" />
+            <div>
+                <button id="logoutBtn" class="user-btn">Cerrar sesión</button>
+            </div>
+        </div>
+
+        <div class="data-card">
+            <h1 class="user-title">Datos</h1>
+            <p class="user-subtitle">Gestiona tu información personal</p>
+            
+            <form id="userDataForm">
+                <div class="form-group">
+                    <label for="cedula">Cédula:</label>
+                    <input type="text" id="cedula" name="cedula" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nombreCompleto">Nombre Completo:</label>
+                    <input type="text" id="nombreCompleto" name="nombreCompleto" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edad">Edad:</label>
+                    <input type="number" id="edad" name="edad" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="Agregar número de teléfono" disabled>
+                </div>
+                
+                <div class="button-group">
+                    <button type="button" id="editBtn" class="edit-btn">Editar</button>
+                    <button type="button" id="saveBtn" class="save-btn" style="display: none;">Guardar</button>
+                    <button type="button" id="cancelBtn" class="cancel-btn" style="display: none;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let originalData = {};
+
+        function showNotification(message, isError = false) {
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${isError ? 'error' : ''}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        async function loadUser() {
+            try {
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const cedula = urlParams.get('cedula');
+                
+                if (!cedula) {
+
+                    window.location.replace('registro.html');
+                    return;
+                }
+
+
+                const response = await fetch(`Apis/api.php/usuarios/${cedula}`);
+                if (!response.ok) {
+                    throw new Error('Usuario no encontrado');
+                }
+                
+                const user = await response.json();
+                if (!user || Object.keys(user).length === 0) {
+                    throw new Error('Usuario no encontrado');
+                }
+                
+                currentUser = user;
+                
+                const nombre = user.NombreCompleto || user.nombre_completo || user.Email || 'usuario';
+                document.getElementById('welcomeTitle').textContent = `Bienvenido ${nombre}`;
+
+  
+                const foto = user.FotoDePerfil;
+                if (foto) {
+                    const urlSubida = `Apis/uploads/${foto}`;
+                    const isDataUrl = typeof foto === 'string' && foto.startsWith('data:image');
+                    document.getElementById('profileImage').src = isDataUrl ? foto : urlSubida;
+                }
+
+                loadUserData(user);
+
+                await loadUnidad(user.Cedula || user.cedula);
+            } catch (e) {
+                console.error('No se pudo cargar el usuario', e);
+                showNotification('Error al cargar los datos del usuario. Redirigiendo al login...', true);
+                setTimeout(() => {
+                    window.location.replace('registro.html');
+                }, 2000);
+            }
+        }
+
+        function loadUserData(user) {
+
+            document.getElementById('cedula').value = user.Cedula || user.cedula || '';
+            document.getElementById('nombreCompleto').value = user.NombreCompleto || user.nombre_completo || '';
+            document.getElementById('email').value = user.Email || user.email || '';
+            document.getElementById('edad').value = user.Edad || user.edad || '';
+            document.getElementById('telefono').value = user.Ntelefono || user.Telefono || user.telefono || '';
+
+            originalData = {
+                cedula: user.Cedula || user.cedula || '',
+                nombreCompleto: user.NombreCompleto || user.nombre_completo || '',
+                email: user.Email || user.email || '',
+                edad: user.Edad || user.edad || '',
+                telefono: user.Ntelefono || user.Telefono || user.telefono || ''
+            };
+        }
+
+        async function loadUnidad(cedula) {
+            const unitEl = document.getElementById('unitInfo');
+            try {
+                unitEl.textContent = 'Unidad habitacional: cargando...';
+                const res = await fetch('Apis/api.php/unidades');
+                const data = await res.json();
+                let numero = null;
+                if (Array.isArray(data)) {
+                    const found = data.find(u => String(u.CeduladelSocio) === String(cedula));
+                    if (found && found.NumeroDeHabitacion) numero = found.NumeroDeHabitacion;
+                }
+                if (numero) {
+                    unitEl.textContent = `Unidad habitacional: ${numero}`;
+                } else {
+                    unitEl.textContent = 'Unidad habitacional: Aún no te asignaron';
+                }
+            } catch (e) {
+                unitEl.textContent = 'Unidad habitacional: Aún no te asignaron';
+            }
+        }
+
+        function enableEdit() {
+            const inputs = document.querySelectorAll('#userDataForm input');
+            inputs.forEach(input => {
+                if (input.id !== 'cedula') {
+                    input.disabled = false;
+                }
+            });
+            
+            document.getElementById('editBtn').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'inline-block';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+        }
+
+        function disableEdit() {
+            const inputs = document.querySelectorAll('#userDataForm input');
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+            
+            document.getElementById('editBtn').style.display = 'inline-block';
+            document.getElementById('saveBtn').style.display = 'none';
+            document.getElementById('cancelBtn').style.display = 'none';
+        }
+
+        function cancelEdit() {
+            document.getElementById('cedula').value = originalData.cedula;
+            document.getElementById('nombreCompleto').value = originalData.nombreCompleto;
+            document.getElementById('email').value = originalData.email;
+            document.getElementById('edad').value = originalData.edad;
+            document.getElementById('telefono').value = originalData.telefono;
+            
+            disableEdit();
+        }
+
+        async function saveData() {
+            try {
+                const formData = {
+                    cedula: document.getElementById('cedula').value,
+                    nombreCompleto: document.getElementById('nombreCompleto').value,
+                    email: document.getElementById('email').value,
+                    edad: document.getElementById('edad').value,
+                    telefono: document.getElementById('telefono').value
+                };
+
+                if (!formData.nombreCompleto.trim()) {
+                    showNotification('El nombre completo es obligatorio', true);
+                    return;
+                }
+                if (!formData.email.trim()) {
+                    showNotification('El email es obligatorio', true);
+                    return;
+                }
+                if (!formData.edad || formData.edad < 1) {
+                    showNotification('La edad debe ser un número válido', true);
+                    return;
+                }
+
+                const apiData = {
+                    nombre_completo: formData.nombreCompleto,
+                    Email: formData.email,
+                    Edad: formData.edad,
+                    Ntelefono: formData.telefono || null
+                };
+
+                const response = await fetch(`Apis/api.php/usuarios/${formData.cedula}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(apiData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    currentUser = { ...currentUser, ...formData };
+
+                    originalData = { ...formData };
+
+                    document.getElementById('welcomeTitle').textContent = `Bienvenido ${formData.nombreCompleto}`;
+
+                    disableEdit();
+                    showNotification('Datos modificados exitosamente');
+                } else {
+                    throw new Error(result.error || 'Error al actualizar los datos');
+                }
+            } catch (error) {
+                console.error('Error al guardar datos:', error);
+                showNotification(`Error al guardar los datos: ${error.message}. Inténtalo de nuevo.`, true);
+            }
+        }
+
+        document.getElementById('editBtn').addEventListener('click', enableEdit);
+        document.getElementById('saveBtn').addEventListener('click', saveData);
+        document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            window.location.replace('registro.html');
+        });
+
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            header.style.background = window.scrollY > 100 ? 'rgba(28, 28, 28, 0.98)' : 'rgba(28, 28, 28, 0.95)';
+        });
+
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        loadUser();
+    </script>
+</body>
+</html>
+
